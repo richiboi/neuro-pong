@@ -47,7 +47,7 @@ class Player():
 class Ball():
     size = 16
     max_return_angle = 0.9
-    initial_vel = 2.5
+    initial_vel = 5.5
 
     def reset(self):
         self.rect = pygame.Rect(WIN_WIDTH // 2, 50, self.size, self.size)
@@ -72,13 +72,10 @@ class Ball():
         if self.rect.y > WIN_HEIGHT-self.size:
             self.angle = -self.angle
             self.rect.y = WIN_HEIGHT-self.size-1
-            print('1')
 
         if self.rect.y < 0:
             self.angle = -self.angle
             self.rect.y = 1
-            print(self.angle)
-            print('2')
 
         if self.rect.x < 0 or self.rect.x > WIN_WIDTH - self.size:
             self.angle = math.pi - self.angle
