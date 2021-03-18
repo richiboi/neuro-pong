@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 from emg import EMG
 
 pygame.init()
@@ -8,7 +9,7 @@ WIN_WIDTH = 1024
 WIN_HEIGHT = 512
 
 win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-pygame.display.set_caption("Pong pong")
+pygame.display.set_caption("Neuro-pong")
 clock = pygame.time.Clock()
 
 # === NEW PLAYER CLASS ==============================
@@ -19,7 +20,7 @@ class Player():
     paddle_width = 20
     paddle_height = 100
     paddle_x_vel = 8
-    paddle_y_vel = 20
+    paddle_y_vel = 10
 
     def reset(self, x, y):
         self.rect = pygame.Rect(x, y, self.paddle_width, self.paddle_height)
@@ -28,22 +29,15 @@ class Player():
     def __init__(self, x, y):
         self.reset(x, y)
 
-    def move_horz(self, dir):
-        # check boundary - left-mid, right-mid
-        if (30 <= self.rect.x + dir * self.paddle_x_vel <= WIN_WIDTH//2 - 100 - self.paddle_width
-                or WIN_WIDTH//2 + 100 <= self.rect.x + dir * self.paddle_x_vel <= WIN_WIDTH-30-self.paddle_width):
-            self.rect.x += dir * self.paddle_x_vel
-
-    def move_vert(self, dir):
+    def move(self, dir):
         if 0 < self.rect.y + dir*self.paddle_y_vel < WIN_HEIGHT-self.paddle_height:
             self.rect.y += dir * self.paddle_y_vel
 
     def draw(self):
         pygame.draw.rect(win, (255, 255, 255), self.rect)
 
+
 # =====Ball class=====================
-
-
 class Ball():
     size = 16
     max_return_angle = 0.9
@@ -127,6 +121,20 @@ class Ball():
 
 
 # ==========================
+# ai functions
+def ai_move(player, ball):
+    # Paddle velocity is 20 (Hard coded for now. Replace later)
+    # Add some noise with random
+    difference_pixel = (ball.rect.centery -
+                        player.rect.centery) / 2 + random.randrange(-20, 20)
+
+    print(difference_pixel)
+    # No higher than 20, lower than -20
+    difference_scaled = max(min(difference_pixel, 20), -20) / 20
+    player.move(difference_scaled)
+
+
+# ==========================
 def draw_env(player1, player2):
     # Display line and text
     pygame.draw.line(win, (255, 255, 255), (WIN_WIDTH//2, 0),
@@ -180,9 +188,8 @@ def game_over_loop(winner):
                 pygame.quit()
                 quit()
 
+
 # ==== MAIN LOOP ========================
-
-
 def main():
     player1 = Player(40, 200)
     player2 = Player(WIN_WIDTH-60, 200)
@@ -200,29 +207,25 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
-            # no repeat keys
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_c:
-                    print('c')
-
         # Check keys
         keys = pygame.key.get_pressed()
 
         # player 1
-        # if keys[pygame.K_w]:
-        #     player1.move_vert(-1)
+        if keys[pygame.K_w]:
+            player1.move(-1)
 
-        # if keys[pygame.K_s]:
-        #     player1.move_vert(1)
+        if keys[pygame.K_s]:
+            player1.move(1)
 
-        player1.move_vert(emg.read())
+        # player1.move(emg.read())
 
         # player 2
-        if keys[pygame.K_UP]:
-            player2.move_vert(-1)
+        # if keys[pygame.K_UP]:
+        #     player2.move(-1)
 
-        if keys[pygame.K_DOWN]:
-            player2.move_vert(1)
+        # if keys[pygame.K_DOWN]:
+        #     player2.move(1)
+        ai_move(player2, ball)
 
         redraw_window(player1, player2, ball)
 

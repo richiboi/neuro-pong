@@ -18,5 +18,4 @@ class EMG:
         # Only one thing in adc.values, but because this
         # is a generator, must access this way
         for voltage in self.adc.values:
-            print(voltage)
             return self._scale_raw(voltage)
