@@ -17,5 +17,5 @@ class EMG:
     def read(self):
         # Only one thing in adc.values, but because this
         # is a generator, must access this way
-        for voltage in adc.values:
+        for voltage in self.adc.values:
             return self._scale_raw(voltage)
